@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>InstaLinkr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-glow" aria-hidden="true"></div>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="6"></rect>
+            <circle cx="12" cy="12" r="4.5"></circle>
+            <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"></circle>
+          </svg>
+        </span>
+        <span class="side-word">Insta<span>Linkr</span></span>
+      </div>
+
+      <nav class="side-nav" id="sideNav">
+        <a href="#/dashboard" data-route="dashboard"><span class="ico">▦</span> Dashboard</a>
+        <a href="#/campaigns" data-route="campaigns"><span class="ico">◎</span> Campaigns</a>
+        <a href="#/leads" data-route="leads"><span class="ico">☷</span> Leads</a>
+        <a href="#/settings" data-route="settings"><span class="ico">⚙</span> Settings</a>
+        <a href="#/admin" data-route="admin" id="navAdmin" hidden><span class="ico">★</span> Admin</a>
+      </nav>
+
+      <div class="side-foot">
+        <div class="user-chip">
+          <span class="user-dot"></span>
+          <span id="sideUser">…</span>
+        </div>
+        <a class="ghost-link block" href="/auth/logout">Log out</a>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="appbar">
+        <button class="icon-btn only-mobile" id="menuBtn" aria-label="Menu">☰</button>
+        <div class="appbar-titles">
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageSub"></p>
+        </div>
+        <div class="appbar-actions" id="pageActions"></div>
+      </header>
+      <div id="view" class="view"></div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+  <div id="modalRoot"></div>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
