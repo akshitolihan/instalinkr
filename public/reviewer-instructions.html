@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reviewer Instructions | InstaLinkr</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="capture-page">
+  <main class="capture-shell legal-page">
+    <h1>Reviewer Instructions</h1>
+    <p>This page explains the InstaLinkr App Review flow for Meta reviewers.</p>
+
+    <h2>App URL</h2>
+    <p><a href="https://instalinkr.com/login">https://instalinkr.com/login</a></p>
+
+    <h2>Test Flow</h2>
+    <ol>
+      <li>Open the app URL and create an account with email/password, or continue with Facebook.</li>
+      <li>After sign-in, open Settings and choose <strong>Connect Instagram</strong>.</li>
+      <li>Authorize the Facebook account that manages an Instagram professional account linked to a Facebook Page.</li>
+      <li>Show the connected Instagram account and Facebook Page in Settings so the selected asset is visible.</li>
+      <li>Return to the dashboard and create a campaign with a keyword, optional Instagram post URL, delivery link, and message template.</li>
+      <li>For the App Review screencast, comment on the connected Instagram account's own media, then use Settings &gt; Live review test to send a private reply to the real Instagram comment ID.</li>
+      <li>Open the native Instagram app or website and show the same private reply delivered to the commenter.</li>
+      <li>In normal production use, when someone comments the configured keyword on the connected Instagram account's own media, the webhook routes the comment to that account and sends a private reply containing the configured link.</li>
+      <li>The lead appears in the Leads table, where the account owner can edit email/follower status or export CSV.</li>
+    </ol>
+
+    <h2>Screencast Checklist</h2>
+    <ul>
+      <li>Show the complete Meta login and permission grant flow.</li>
+      <li>Show the selected Instagram account and Facebook Page asset in the app.</li>
+      <li>Show the live private reply send action in Settings &gt; Live review test.</li>
+      <li>Show the delivered message in the native Instagram client after sending.</li>
+    </ul>
+
+    <h2>Permission Usage</h2>
+    <ul>
+      <li><code>instagram_basic</code>: displays connected Instagram account ID and username so the account owner knows which account is connected.</li>
+      <li><code>instagram_manage_comments</code>: receives comment webhook events and reads comment IDs so campaign keywords can match comments.</li>
+      <li><code>instagram_manage_messages</code>: sends the configured private reply to the commenter using the comment ID.</li>
+    </ul>
+
+    <h2>Notes</h2>
+    <p>The app does not ask for or expose commenter follower status from Meta because the official API does not provide a direct follower check for arbitrary commenters. The optional follower field is self-reported or manually verified by the account owner.</p>
+  </main>
+</body>
+</html>
