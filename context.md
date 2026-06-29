@@ -78,3 +78,12 @@ The user believes the app may currently exist only on Vercel and not in GitHub. 
 - GitHub token permission check: token belongs to `akshitolihan` and can read repo metadata for `akshitolihan/instalinkr`, but GitHub rejects both Contents API writes and Git blob writes with `403 Resource not accessible by personal access token`. The token needs repository `Contents: Read and write` permission for `akshitolihan/instalinkr`.
 - User provided a replacement GitHub token after selecting repository `akshitolihan/instalinkr` and permission `Contents: Read and write`. Use it only for the recovery push, do not store it, and revoke it after push verification.
 - Recovery push succeeded to `akshitolihan/instalinkr`: 19 files uploaded (`18` recovered source files plus `context.md`). Key files verified from GitHub after upload: `package.json`, `src/server.js`, `public/app.js`, and `context.md`.
+- User requested a health check starting with login. Scope: verify the live app login page and all configured login methods are working/up to date, beginning with email/password, Facebook OAuth, and any Google/phone methods exposed by configuration.
+- Login smoke test results:
+  - `GET /api/auth/methods` on `https://instalinkr.com` returns `{"facebook":true,"google":false,"email":true,"phone":false}`.
+  - Email/password auth passed end to end with a disposable test account: signup returned 200, `/api/me` returned 200, logout returned 200, login returned 200, `/api/me` returned 200, and cleanup account deletion returned 200.
+  - Facebook OAuth starts correctly: `/auth/facebook` returns a 302 redirect to `https://www.facebook.com/v25.0/dialog/oauth` with app id `2642028639545238`, callback `https://instalinkr.com/oauth/callback`, and the expected Instagram/Page scopes.
+  - Google sign-in is currently disabled by configuration and `/auth/google` returns `Google sign-in is not configured yet.`
+  - Phone sign-in is currently disabled by configuration and `/api/auth/phone/start` returns `Phone sign-in is not configured.`
+  - Login UI check passed: email form is present, Facebook button is present, Google button is hidden, and Phone tab is hidden when disabled.
+  - Meta official changelog shows Graph API `v25.0` is current/latest as of this check; app uses `GRAPH_VERSION = v25.0`.
