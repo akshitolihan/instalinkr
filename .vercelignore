@@ -1,0 +1,13 @@
+.env
+.env.*
+node_modules
+data
+*.pid
+*.out
+*.err
+*.job
+cloudflared*
+ngrok*
+serveo*
+ssh-tunnel*
+localtunnel*
