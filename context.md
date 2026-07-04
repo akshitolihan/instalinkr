@@ -87,3 +87,21 @@ The user believes the app may currently exist only on Vercel and not in GitHub. 
   - Phone sign-in is currently disabled by configuration and `/api/auth/phone/start` returns `Phone sign-in is not configured.`
   - Login UI check passed: email form is present, Facebook button is present, Google button is hidden, and Phone tab is hidden when disabled.
   - Meta official changelog shows Graph API `v25.0` is current/latest as of this check; app uses `GRAPH_VERSION = v25.0`.
+
+### 2026-07-04
+
+- Inspected Meta/Facebook Developers app `DM Funnel` (`2642028639545238`) while logged in. App Mode shown in the dashboard header is `Development`, with the Live toggle visible.
+- App Review > Requests currently shows `Status: Review in progress`. Meta notes most submissions are reviewed within 20 days.
+- Current App Review submission details show request results for `June 26, 2026 at 09:59 GMT+5:30`.
+- Current requested permissions/features under review:
+  - `instagram_basic`
+  - `instagram_manage_comments`
+  - `instagram_manage_messages`
+- Current submission includes a `3:47` walkthrough video under each requested permission and written explanations describing InstaLinkr's use of account identity, comment keyword matching, and sending one private reply/DM in response to a trigger comment.
+- Previous submission result shown under App Review:
+  - Submitted on `June 24, 2026 at 12:45 GMT+5:30`.
+  - Result: `Submission not approved`.
+  - Rejected permissions/features: `instagram_basic`, `instagram_manage_comments`, and `instagram_manage_messages`.
+  - Main rejection reason: `Screencast Not Aligned with Use Case Details`, Developer Policy `1.6 - Build a Trustworthy Product`.
+  - Reviewer noted that the use case itself was allowed, but the screencast did not demonstrate the full end-to-end experience.
+  - Specific reviewer feedback for `instagram_manage_messages`: the screencast did not show a message being sent from the app UI and the same message appearing in the native client. Reviewer asked for a re-recording showing asset selection, a live send action from the app, and the delivered message in Instagram/Messenger/WhatsApp.
