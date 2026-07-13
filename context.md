@@ -105,3 +105,18 @@ The user believes the app may currently exist only on Vercel and not in GitHub. 
   - Main rejection reason: `Screencast Not Aligned with Use Case Details`, Developer Policy `1.6 - Build a Trustworthy Product`.
   - Reviewer noted that the use case itself was allowed, but the screencast did not demonstrate the full end-to-end experience.
   - Specific reviewer feedback for `instagram_manage_messages`: the screencast did not show a message being sent from the app UI and the same message appearing in the native client. Reviewer asked for a re-recording showing asset selection, a live send action from the app, and the delivered message in Instagram/Messenger/WhatsApp.
+
+### 2026-07-13
+
+- Inspected Meta/Facebook Developers app `DM Funnel` (`2642028639545238`) while logged in.
+- App Review > Requests currently shows `Not submitted`; there is no active submission waiting for review.
+- Latest previous submission is shown as submitted on `July 9, 2026 at 06:12 GMT+5:30`.
+- Latest result: `Submission not approved`.
+- Latest rejected permissions/features:
+  - `instagram_basic`
+  - `instagram_manage_comments`
+  - `instagram_manage_messages`
+- Feedback detail page for submission `2667594150322020` shows request results for `June 26, 2026 at 09:59 GMT+5:30`.
+- Main rejection reason remains `Screencast Not Aligned with Use Case Details`, Developer Policy `1.6 - Build a Trustworthy Product`.
+- Meta again says the use case is allowed, but the submitted screencast does not demonstrate the end-to-end experience described in the notes.
+- New reviewer note: static examples were shown instead of a live interaction. Meta asked to re-record using a real API call that retrieves data or publishes content, and to display the success state in the app UI.
