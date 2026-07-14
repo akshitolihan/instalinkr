@@ -56,6 +56,12 @@ function spinner() { return `<div class="loading"><div class="spin"></div></div>
 function empty(icon, title, sub, cta = "") {
   return `<div class="empty"><div class="empty-ico">${icon}</div><h3>${esc(title)}</h3><p>${esc(sub)}</p>${cta}</div>`;
 }
+function jsonBlock(value) {
+  return `<pre class="result-json">${esc(JSON.stringify(value, null, 2))}</pre>`;
+}
+function resultPanel(title, value, type = "ok") {
+  return `<div class="result-box ${type}"><strong>${esc(title)}</strong>${jsonBlock(value)}</div>`;
+}
 
 function stopCommentPolling() {
   if (commentPollTimer) clearInterval(commentPollTimer);
@@ -88,7 +94,7 @@ async function pollComments({ showToast = false, refresh = false } = {}) {
 function startCommentPolling() {
   stopCommentPolling();
   setTimeout(() => pollComments(), 700);
-  commentPollTimer = setInterval(() => pollComments(), 2000);
+  commentPollTimer = setInterval(() => pollComments(), 30000);
 }
 
 // ---------- views ----------
@@ -298,7 +304,12 @@ async function viewSettings() {
 
     <div class="panel">
       <div class="panel-head"><h2>Live review test</h2></div>
-      <p class="muted">For Meta App Review, comment on your Instagram post, copy the real comment ID from webhook logs or Meta tooling, then send a private reply from this app and show the delivered message in Instagram.</p>
+      <p class="muted">For Meta App Review, load recent comments from Meta, choose a real comment ID, send a private reply from this app, and show the success state here plus the delivered message in Instagram.</p>
+      <div class="inline-actions">
+        <button class="btn ghost" type="button" id="loadLiveComments" ${s.connected ? "" : "disabled"}>Load recent Meta comments</button>
+        <button class="btn ghost" type="button" id="processLiveComments" ${s.connected ? "" : "disabled"}>Process recent comments</button>
+      </div>
+      <div id="liveCommentsResult"></div>
       <form id="reviewSendForm">
         <label>Instagram comment ID
           <input name="commentId" placeholder="179..." ${s.connected ? "" : "disabled"} required>
@@ -308,6 +319,7 @@ async function viewSettings() {
         </label>
         <button class="btn primary" type="submit" ${s.connected ? "" : "disabled"}>Send private reply</button>
       </form>
+      <div id="reviewSendResult"></div>
     </div>
 
     <div class="panel">
@@ -333,13 +345,50 @@ async function viewSettings() {
     try { await api("/api/account", { method: "PATCH", body: JSON.stringify(payload) }); toast("Default message saved"); }
     catch (err) { toast(err.message, "err"); }
   });
+  $("#loadLiveComments").addEventListener("click", async () => {
+    const target = $("#liveCommentsResult");
+    target.innerHTML = spinner();
+    try {
+      const result = await api("/api/review/live-comments");
+      const comments = result.comments || [];
+      target.innerHTML = `
+        <div class="result-box ok">
+          <strong>Live Meta comments loaded at ${esc(fmtDate(result.fetchedAt))}</strong>
+          ${comments.length ? `<div class="comment-list">${comments.slice(0, 8).map((c) => `
+            <button class="comment-choice" type="button" data-comment-choice="${esc(c.commentId)}">
+              <span>@${esc(c.username || "unknown")}</span>
+              <em>${esc(c.text || "")}</em>
+              <small>${esc(c.commentId)}</small>
+            </button>`).join("")}</div>` : `<p class="muted-sm">No recent comments were returned by Meta.</p>`}
+          ${jsonBlock({ source: result.source, checked: result.checked, instagram: result.instagram })}
+        </div>`;
+    } catch (err) {
+      target.innerHTML = resultPanel("Could not load live comments", { error: err.message }, "err");
+    }
+  });
+  $("#processLiveComments").addEventListener("click", async () => {
+    const target = $("#liveCommentsResult");
+    target.innerHTML = spinner();
+    try {
+      const result = await api("/api/poll-comments", { method: "POST", body: "{}" });
+      target.innerHTML = resultPanel("Recent comments processed", result);
+    } catch (err) {
+      target.innerHTML = resultPanel("Could not process comments", { error: err.message }, "err");
+    }
+  });
   $("#reviewSendForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const payload = Object.fromEntries(new FormData(e.target));
+    const target = $("#reviewSendResult");
+    target.innerHTML = spinner();
     try {
-      await api("/api/review-test/private-reply", { method: "POST", body: JSON.stringify(payload) });
+      const result = await api("/api/review-test/private-reply", { method: "POST", body: JSON.stringify(payload) });
+      target.innerHTML = resultPanel("Private reply result", result.successState || result);
       toast("Private reply sent. Check Instagram for the delivered message.");
-    } catch (err) { toast(err.message, "err"); }
+    } catch (err) {
+      target.innerHTML = resultPanel("Private reply failed", { error: err.message, commentId: payload.commentId }, "err");
+      toast(err.message, "err");
+    }
   });
   $("#delAccount").addEventListener("click", () => {
     openModal("Delete account?", `<p>This permanently deletes your account, campaigns and leads. Type <strong>DELETE</strong> to confirm.</p>
@@ -375,6 +424,19 @@ async function viewAdmin() {
       <div class="health-row">${healthRows}</div>
       <p class="muted-sm">Store: ${esc(health.storeBackend)} - DM mode: ${health.dryRun ? "dry-run (pre-approval)" : "live"}</p></div>` : ""}
 
+    <div class="panel">
+      <div class="panel-head"><h2>Endpoint diagnostics</h2></div>
+      <p class="muted">Run the live backend checks from the app UI so review and support sessions can show real API responses.</p>
+      <div class="inline-actions">
+        <button class="btn ghost" id="checkMeta">Check Meta connection</button>
+        <button class="btn ghost" id="diagnoseMeta">Diagnose webhooks</button>
+        <button class="btn ghost" id="showWebhookTest">Webhook verify URL</button>
+        <button class="btn ghost" id="discoverInstagram">Discover Instagram account</button>
+        <button class="btn ghost" id="showConfig">Config status</button>
+      </div>
+      <div id="adminEndpointResult"></div>
+    </div>
+
     <div class="section-head"><h2>Customers</h2><span>${data.accounts.length}</span></div>
     <div class="table-wrap"><table>
       <thead><tr><th>Customer</th><th>Instagram</th><th>Page</th><th>Webhook</th><th>Campaigns</th><th>Leads</th><th>Joined</th><th></th></tr></thead>
@@ -389,6 +451,22 @@ async function viewAdmin() {
         <td><button class="btn ghost sm" data-acct="${acc.id}">View</button></td>
       </tr>`).join("")}</tbody>
     </table></div>`;
+
+  const showAdminResult = async (title, path) => {
+    const target = $("#adminEndpointResult");
+    target.innerHTML = spinner();
+    try {
+      const result = await api(path);
+      target.innerHTML = resultPanel(title, result, result.ok === false ? "warn" : "ok");
+    } catch (err) {
+      target.innerHTML = resultPanel(title, { error: err.message }, "err");
+    }
+  };
+  $("#checkMeta").addEventListener("click", () => showAdminResult("Meta connection", "/api/meta/check"));
+  $("#diagnoseMeta").addEventListener("click", () => showAdminResult("Webhook diagnostics", "/api/meta/diagnose"));
+  $("#showWebhookTest").addEventListener("click", () => showAdminResult("Webhook verification test", "/api/webhook-test-url"));
+  $("#discoverInstagram").addEventListener("click", () => showAdminResult("Instagram discovery", "/api/setup/discover-instagram"));
+  $("#showConfig").addEventListener("click", () => showAdminResult("Config status", "/api/config"));
 }
 
 async function adminAccountModal(id) {
@@ -448,8 +526,15 @@ document.addEventListener("click", async (e) => {
   const delId = t.dataset?.del;
   const delLead = t.dataset?.dellead;
   const acctId = t.dataset?.acct;
+  const commentChoice = t.closest("[data-comment-choice]")?.dataset?.commentChoice;
 
-  if (editId) {
+  if (commentChoice) {
+    const input = document.querySelector("#reviewSendForm input[name=commentId]");
+    if (input) {
+      input.value = commentChoice;
+      toast("Comment ID selected");
+    }
+  } else if (editId) {
     const state = await api("/api/state");
     campaignModal(state.campaigns.find((c) => c.id === editId));
   } else if (toggleId) {

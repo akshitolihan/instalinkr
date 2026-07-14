@@ -149,6 +149,18 @@ input::placeholder, textarea::placeholder { color: #59616f; }
 input:focus, textarea:focus, select:focus { outline: none; border-color: var(--brand-2); box-shadow: 0 0 0 3px rgba(214,41,118,.18); }
 textarea { resize: vertical; }
 .hint { color: var(--text-dim); font-size: .78rem; font-weight: 400; }
+.inline-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0; }
+.result-box { border: 1px solid var(--border-strong); border-left-width: 3px; border-radius: 12px; background: var(--bg-2); padding: 14px; margin: 14px 0; display: grid; gap: 10px; }
+.result-box.ok { border-left-color: var(--ok); }
+.result-box.warn { border-left-color: var(--warn); }
+.result-box.err { border-left-color: var(--err); }
+.result-json { margin: 0; padding: 12px; border-radius: 10px; background: #080a0f; border: 1px solid var(--border); color: var(--text-muted); font-size: .78rem; line-height: 1.5; overflow-x: auto; white-space: pre-wrap; }
+.comment-list { display: grid; gap: 8px; }
+.comment-choice { text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 11px 12px; cursor: pointer; display: grid; gap: 4px; }
+.comment-choice:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.comment-choice span { font-weight: 700; }
+.comment-choice em { color: var(--text-muted); font-style: normal; }
+.comment-choice small { color: var(--text-dim); overflow-wrap: anywhere; }
 
 /* ---------- toolbar / table ---------- */
 .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }

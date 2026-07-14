@@ -797,6 +797,34 @@ app.post("/api/poll-comments", requireAuth, async (req, res) => {
   }
 });
 
+app.get("/api/review/live-comments", requireAuth, async (req, res) => {
+  if (!req.account.igUserId || !req.account.accessToken) {
+    res.status(400).json({ error: "Connect an Instagram professional account before reading live comments." });
+    return;
+  }
+
+  try {
+    const mediaLimit = Math.min(Math.max(Number(req.query.mediaLimit || 10), 1), 25);
+    const commentLimit = Math.min(Math.max(Number(req.query.commentLimit || 25), 1), 50);
+    const comments = await fetchRecentInstagramComments(req.account, { mediaLimit, commentLimit });
+    res.json({
+      ok: true,
+      source: "meta_graph_api",
+      fetchedAt: nowIso(),
+      instagram: {
+        igUserId: req.account.igUserId,
+        username: req.account.username || "",
+        pageId: req.account.pageId || "",
+        pageName: req.account.pageName || ""
+      },
+      checked: comments.length,
+      comments: comments.slice(0, 50)
+    });
+  } catch (error) {
+    res.status(502).json({ error: error.message });
+  }
+});
+
 app.post("/api/review-test/private-reply", requireAuth, async (req, res) => {
   const commentId = String(req.body.commentId || "").trim();
   const message = String(req.body.message || "").trim();
@@ -811,17 +839,31 @@ app.post("/api/review-test/private-reply", requireAuth, async (req, res) => {
   }
 
   try {
+    const sentAt = nowIso();
     const metaResponse = await sendPrivateReply({ commentId, message, account: req.account });
+    const successState = {
+      status: "sent",
+      mode: getMetaConfigStatus().dryRun ? "dry_run" : "live_meta_api",
+      sentAt,
+      commentId,
+      instagram: {
+        igUserId: req.account.igUserId,
+        username: req.account.username || "",
+        pageId: req.account.pageId || "",
+        pageName: req.account.pageName || ""
+      },
+      metaResponse
+    };
     await mutateStore(async (data) => {
       data.events.unshift({
         id: createId("evt"),
         accountId: req.account.id,
         type: "review_private_reply_sent",
-        payload: { commentId, message, metaResponse },
+        payload: { commentId, message, successState },
         createdAt: nowIso()
       });
     });
-    res.json({ sent: true, metaResponse });
+    res.json({ sent: true, successState, metaResponse });
   } catch (error) {
     await mutateStore(async (data) => {
       data.events.unshift({

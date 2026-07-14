@@ -120,3 +120,24 @@ The user believes the app may currently exist only on Vercel and not in GitHub. 
 - Main rejection reason remains `Screencast Not Aligned with Use Case Details`, Developer Policy `1.6 - Build a Trustworthy Product`.
 - Meta again says the use case is allowed, but the submitted screencast does not demonstrate the end-to-end experience described in the notes.
 - New reviewer note: static examples were shown instead of a live interaction. Meta asked to re-record using a real API call that retrieves data or publishes content, and to display the success state in the app UI.
+
+### 2026-07-14
+
+- Connected the review/demo flow to live backend endpoints so Meta reviewers can see real API interaction instead of static examples.
+- Added `GET /api/review/live-comments` for signed-in connected accounts. It fetches recent Instagram comments from Meta Graph using the connected account/page token and returns the source, fetch timestamp, connected Instagram/Page identity, and comment IDs.
+- Enhanced `POST /api/review-test/private-reply` so the response includes a structured `successState` with mode (`live_meta_api` or `dry_run`), sent timestamp, comment ID, connected Instagram/Page identity, and the raw Meta response.
+- Updated Settings > Live review test:
+  - Added "Load recent Meta comments" to retrieve real comments from Meta.
+  - Added selectable comment rows that fill the review private-reply comment ID field.
+  - Added "Process recent comments" to run the production comment-processing path from the UI.
+  - Added visible JSON result panels for both live-comment retrieval and private-reply success/error states.
+- Updated Admin with endpoint diagnostic buttons for Meta connection, webhook diagnostics, webhook verification URL, Instagram discovery, and config status.
+- Reduced automatic comment polling interval from 2 seconds to 30 seconds to avoid unnecessarily hammering Meta Graph while the dashboard is open.
+- Added `.gitignore` for local-only artifacts: `node_modules/`, `data/`, `.env`, and `*.log`.
+- Verification performed locally:
+  - `node --check src/server.js`
+  - `node --check src/meta.js`
+  - `node --check public/app.js`
+  - Local server started successfully at `http://localhost:3000`.
+  - Temporary email signup and `/api/me` worked.
+  - New review endpoints returned expected `400` validation for an account that had not connected Instagram yet.
